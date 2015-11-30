@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" href="http://test.com/media/bootstrap/css/bootstrap.min.css" media="screen" type="text/css" />
+<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" media="screen" type="text/css" />
+<link rel="stylesheet" href="i.css" media="screen" type="text/css" />
+<body>
+<div class="chat">
+	<ul class="chat-thread" id="msgs">
+	</ul>
+	<form class="chat-form">
+		<input class="chat-window-message" id="msg_content" autofocus>
+		<button type="button" class="btn btn-info pull-right" id="send_btn" style="width:80px;margin-top:6px;display:none">发送</button>
+	</form>
+</div>
+
+<script src="http://admin.com/media/js/jquery.min.js"></script>
+<script src="http://admin.com/media/bootstrap/js/bootstrap.min.js"></script>
+
+<script>
+//var ws = new WebSocket("ws://192.168.1.106:10089/");
+var ws = new WebSocket("ws://127.0.0.1:10089/");
+ws.onopen = function() {
+	var data = {
+		'type': 'sysmsg',
+		'msg': 'welcome! ',
+	};
+	addsysmsg(data);
+};
+ws.onclose = function() {
+	var data = {
+		'type': 'sysmsg',
+		'msg': 'sys closed',
+	};
+	addsysmsg(data);
+};
+ws.onmessage = function (evt) {
+	var data = JSON.parse(event.data);
+	if (data.type == 'msg') {
+		addmsg(data, 'left');
+	} else {
+		addsysmsg(data);
+	}
+};
+function addmsg(data, direction) {
+	if (!data.msg) {
+		data.msg = '...&nbsp;';
+	}
+	$('#msgs').append('<li class="'+direction+'"><div class="avatar glyphicon glyphicon-user"></div>'+data.msg+'</li>');
+	$('#msgs')[0].scrollTop = $('#msgs')[0].scrollHeight;
+}
+
+function addsysmsg(data) {
+	addmsg(data, 'left');
+}
+$(function() {
+	$('#send_btn').click(function() {
+		var msg = $('#msg_content').val();
+		if ($.trim(msg) == '') {
+			return false;
+		}
+		var data = {
+			'type': 'msg',
+			'msg': msg,
+		};
+		addmsg(data, 'right');
+		ws.send(JSON.stringify(data));
+		$('#msg_content').val('');
+	});
+	$(window).keydown(function (event) {
+		if (event.which === 13) {
+			$('#send_btn').click();
+			return false;
+		}
+    });
+});
+</script>
+
+</body>
+</html>

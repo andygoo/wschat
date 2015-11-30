@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html>
+<link rel="stylesheet" href="http://test.com/media/bootstrap/css/bootstrap.min.css" media="screen" type="text/css" />
+<link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" media="screen" type="text/css" />
+<link rel="stylesheet" href="c.css" media="screen" type="text/css" />
+<body>
+<div class="chat">
+	<ul class="chat-thread" id="msgs">
+	</ul>
+	<form class="chat-form">
+		<textarea class="form-control" rows="3" id="msg_content" autofocus></textarea>
+		<button type="button" class="btn btn-info pull-right" id="send_btn" style="width:80px;margin-top:6px">发送</button>
+	</form>
+</div>
+
+<script src="http://admin.com/media/js/jquery.min.js"></script>
+<script src="http://admin.com/media/bootstrap/js/bootstrap.min.js"></script>
+
+<script>
+//var ws = new WebSocket("ws://192.168.1.106:10089/");
+var ws = new WebSocket("ws://127.0.0.1:10089/");
+ws.onopen = function() {
+	var nickname = $('#nickname').val();
+	if ($.trim(nickname) == '') {
+		$('#nickModal').modal({backdrop: 'static', keyboard: false});
+		return false;
+	}
+	welcome(nickname);
+};
+ws.onclose = function() {
+	var data = {
+		'type': 'sysmsg',
+		'msg': 'sys closed',
+	};
+	addsysmsg(data);
+};
+ws.onmessage = function (evt) {
+	var data = JSON.parse(event.data);
+	console.log(data);
+	if (data.type == 'msg') {
+		addmsg(data, 'left');
+	} else {
+		addsysmsg(data);
+	}
+};
+function addmsg(data, direction) {
+	if (direction == 'left') {
+		$('#msgs').append('<li class="'+direction+'"><div class="avatar glyphicon glyphicon-user"></div>'+data.msg+'<div class="nick">'+data.nick+'</div></li>');
+	} else if (direction == 'right') {
+		$('#msgs').append('<li class="'+direction+'"><div class="avatar glyphicon glyphicon-user"></div>'+data.msg+'</li>');
+	}
+	$('#msgs')[0].scrollTop = $('#msgs')[0].scrollHeight;
+}
+
+function addsysmsg(data) {
+	if (data.type == 'join') {
+		data.msg = data.nick + ' joined';
+	} else if (data.type == 'exit') {
+		data.msg = data.nick + ' exited';
+	}
+	$('#msgs').append('<li class="mid"><span>'+data.msg+'</span></li>');
+}
+function welcome(nick) {
+	var data = {
+		'type': 'sysmsg',
+		'msg': 'welcome! ' + nick,
+	};
+	addsysmsg(data);
+}
+$(function() {
+	$('#send_btn').click(function() {
+		var msg = $('#msg_content').val();
+		if ($.trim(msg) == '') {
+			return false;
+		}
+		var data = {
+			'type': 'msg',
+			'msg': msg,
+		};
+		addmsg(data, 'right');
+		ws.send(JSON.stringify(data));
+		$('#msg_content').val('');
+	});
+	$('#nick_btn').click(function() {
+		var nickname = $('#nickname').val();
+		if ($.trim(nickname) == '') {
+			return false;
+		}
+		var data = {
+			'type': 'join',
+			'nick': nickname,
+		};
+		ws.send(JSON.stringify(data));
+		$('#nickModal').modal('hide');
+		welcome(nickname);
+	});
+});
+</script>
+
+<div class="modal" id="nickModal" tabindex="-1">
+	<div class="modal-dialog modal-sm" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h4 class="modal-title">请输入昵称</h4>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<input type="text" class="form-control" id="nickname">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-info" id="nick_btn">确定</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+</body>
+</html>

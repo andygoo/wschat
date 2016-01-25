@@ -1,24 +1,30 @@
 <!DOCTYPE html>
-<html>
-<link rel="stylesheet" href="http://test.com/media/bootstrap/css/bootstrap.min.css" media="screen" type="text/css" />
+<html lang="zh-cn" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" media="screen" type="text/css" />
 <link rel="stylesheet" href="c.css" media="screen" type="text/css" />
 <body>
 <div class="chat">
-	<ul class="chat-thread" id="msgs">
-	</ul>
-	<form class="chat-form">
-		<textarea class="form-control" rows="3" id="msg_content" autofocus></textarea>
-		<button type="button" class="btn btn-info pull-right" id="send_btn" style="width:80px;margin-top:6px">发送</button>
-	</form>
+	<ul class="chat-thread" id="msgs"></ul>
+	<div id="msg-input" class="form-group" style="background: #fff; position: fixed; left:0; bottom:0; padding: 8px 6px; margin-bottom: 0; border-top: 1px solid #ddd">
+	<div class="input-group">
+		<input type="text" class="form-control" id="msg_content" name="title" value="" placeholder="" autofocus>
+		<span class="input-group-btn">
+			<button class="btn btn-info" type="button" id="send_btn" style="outline:none">发送</button>
+		</span>
+	</div>
+   </div>
 </div>
+<script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
+<script src="http://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
-<script src="http://admin.com/media/js/jquery.min.js"></script>
-<script src="http://admin.com/media/bootstrap/js/bootstrap.min.js"></script>
 
 <script>
 //var ws = new WebSocket("ws://192.168.1.106:10089/");
-var ws = new WebSocket("ws://127.0.0.1:10089/");
+//var ws = new WebSocket("ws://127.0.0.1:10089/");
+var ws = new WebSocket("ws://192.168.2.56:10089/");
 ws.onopen = function() {
 	var nickname = $('#nickname').val();
 	if ($.trim(nickname) == '') {
@@ -49,7 +55,8 @@ function addmsg(data, direction) {
 	} else if (direction == 'right') {
 		$('#msgs').append('<li class="'+direction+'"><div class="avatar glyphicon glyphicon-user"></div>'+data.msg+'</li>');
 	}
-	$('#msgs')[0].scrollTop = $('#msgs')[0].scrollHeight;
+	//$('#msgs')[0].scrollTop = $('#msgs')[0].scrollHeight;
+	$('body')[0].scrollTop = $('body')[0].scrollHeight;
 }
 
 function addsysmsg(data) {
@@ -79,7 +86,7 @@ $(function() {
 		};
 		addmsg(data, 'right');
 		ws.send(JSON.stringify(data));
-		$('#msg_content').val('');
+		$('#msg_content').val('').focus();
 	});
 	$('#nick_btn').click(function() {
 		var nickname = $('#nickname').val();

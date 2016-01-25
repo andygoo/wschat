@@ -1,24 +1,29 @@
 <!DOCTYPE html>
-<html>
-<link rel="stylesheet" href="http://test.com/media/bootstrap/css/bootstrap.min.css" media="screen" type="text/css" />
+<html lang="zh-cn" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <link rel="stylesheet" href="http://cdn.bootcss.com/bootstrap/3.3.5/css/bootstrap.min.css" media="screen" type="text/css" />
 <link rel="stylesheet" href="i.css" media="screen" type="text/css" />
 <body>
 <div class="chat">
-	<ul class="chat-thread" id="msgs">
-	</ul>
-	<form class="chat-form">
-		<input class="chat-window-message" id="msg_content" autofocus>
-		<button type="button" class="btn btn-info pull-right" id="send_btn" style="width:80px;margin-top:6px;display:none">发送</button>
-	</form>
+	<ul class="chat-thread" id="msgs"></ul>
+	<div id="msg-input" class="form-group" style="background: #fff; position: fixed; left:0; bottom:0; padding: 8px 6px; margin-bottom: 0; border-top: 1px solid #ddd">
+        <div class="input-group">
+            <input type="text" class="form-control" id="msg_content" name="title" value="" placeholder="" autofocus>
+            <span class="input-group-btn">
+                <button class="btn btn-info" type="button" id="send_btn" style="outline:none">发送</button>
+            </span>
+        </div>
+     </div>
 </div>
 
-<script src="http://admin.com/media/js/jquery.min.js"></script>
-<script src="http://admin.com/media/bootstrap/js/bootstrap.min.js"></script>
+<script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
 
 <script>
 //var ws = new WebSocket("ws://192.168.1.106:10089/");
-var ws = new WebSocket("ws://127.0.0.1:10089/");
+//var ws = new WebSocket("ws://127.0.0.1:10089/");
+var ws = new WebSocket("ws://192.168.2.56:10089/");
 ws.onopen = function() {
 	var data = {
 		'type': 'sysmsg',
@@ -53,6 +58,7 @@ function addsysmsg(data) {
 	addmsg(data, 'left');
 }
 $(function() {
+	$('#msgs').attr('style', 'height:' + ($(window).height()-51) + 'px');
 	$('#send_btn').click(function() {
 		var msg = $('#msg_content').val();
 		if ($.trim(msg) == '') {
@@ -65,13 +71,8 @@ $(function() {
 		addmsg(data, 'right');
 		ws.send(JSON.stringify(data));
 		$('#msg_content').val('');
+		return false;
 	});
-	$(window).keydown(function (event) {
-		if (event.which === 13) {
-			$('#send_btn').click();
-			return false;
-		}
-    });
 });
 </script>
 

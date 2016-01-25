@@ -27,7 +27,7 @@ var ws = new WebSocket("ws://192.168.2.56:10089/");
 ws.onopen = function() {
 	var data = {
 		'type': 'sysmsg',
-		'msg': 'welcome! ',
+		'msg': '你好',
 	};
 	addsysmsg(data);
 };
@@ -51,14 +51,15 @@ function addmsg(data, direction) {
 		data.msg = '...&nbsp;';
 	}
 	$('#msgs').append('<li class="'+direction+'"><div class="avatar glyphicon glyphicon-user"></div>'+data.msg+'</li>');
-	$('#msgs')[0].scrollTop = $('#msgs')[0].scrollHeight;
+	//$('#msgs')[0].scrollTop = $('#msgs')[0].scrollHeight;
+	$('body')[0].scrollTop = $('body')[0].scrollHeight;
 }
 
 function addsysmsg(data) {
 	addmsg(data, 'left');
 }
 $(function() {
-	$('#msgs').attr('style', 'height:' + ($(window).height()-51) + 'px');
+	//$('#msgs').attr('style', 'height:' + ($(window).height()-51) + 'px');
 	$('#send_btn').click(function() {
 		var msg = $('#msg_content').val();
 		if ($.trim(msg) == '') {
@@ -70,7 +71,7 @@ $(function() {
 		};
 		addmsg(data, 'right');
 		ws.send(JSON.stringify(data));
-		$('#msg_content').val('');
+		$('#msg_content').val('').focus();
 		return false;
 	});
 });

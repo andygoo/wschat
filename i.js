@@ -1,5 +1,6 @@
 var WebSocketServer = require('ws').Server, 
     wss = new WebSocketServer({port: 10089});
+var uuid = require('node-uuid');
 	
 var http = require('http');
 var querystring=require('querystring');
@@ -12,7 +13,7 @@ var opts = {
 wss.on('connection', function connection(ws) {
     ws.on('message', function(data) {
 		data = JSON.parse(data);
-		var q = querystring.stringify({'q': data.msg});
+		var q = querystring.stringify({'q': data.msg, 'uid': ws.uid});
 		opts.path = '/reply?'+q;
 		var req = http.request(opts, function(res) {
 			res.setEncoding('utf8');  
@@ -23,10 +24,14 @@ wss.on('connection', function connection(ws) {
 					msg: chunk.data,
 					type: 'msg'
 				};
-				ws.send(JSON.stringify(data));
+				if (chunk.data != '') {
+					ws.send(JSON.stringify(data));
+				}
 			});
 		});
 		req.end();
     });
+	
+	ws.uid = uuid.v4();
 });
 

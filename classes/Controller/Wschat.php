@@ -1,6 +1,6 @@
 <?php
 
-class Controller_Wechat extends Controller {
+class Controller_Wschat extends Controller {
 
     public function action_index() {
         $wx = new WeixinOauth();
@@ -10,7 +10,7 @@ class Controller_Wechat extends Controller {
             $this->redirect('weixin/oauth/login?callback_url=' . urlencode($callback_url));
         }
 		
-        $this->template = View::factory('wechat');
+        $this->template = View::factory('wschat');
 		$this->template->user_info = $user_info;
     }
 }

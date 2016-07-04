@@ -1,28 +1,18 @@
 var WebSocketServer = require('ws').Server, 
-    wss = new WebSocketServer({ port: 10089 });
+    wss = new WebSocketServer({port: 10089});
 var uuid = require('node-uuid');
 
 wss.on('connection', function connection(ws) {
-    ws.on('message', function(data) {
+    ws.on('message', function incoming(data) {
         data = JSON.parse(data);
-        if (data.type == 'join') {
-            ws.nick = data.nick;
-            wss.broadcast({
-                nick: ws.nick,
-                uid: ws.uid,
-                type: 'join'
-            });
-        } else {
-            wss.broadcast({
-                nick: ws.nick,
-                uid: ws.uid,
-                time: new Date().getTime(),
-                msg: data.msg,
-                type: 'msg'
-            });
-        }
+		if (data.nick) {
+			ws.nick = data.nick;
+		}
+		data.nick = ws.nick;
+		data.uid = ws.uid;
+		data.time = new Date().getTime();
+		wss.broadcast(data);
     });
-
 	ws.on('close', function() {
         wss.broadcast({
             nick: ws.nick,
@@ -30,9 +20,8 @@ wss.on('connection', function connection(ws) {
             type: 'exit'
         });
     });
-	
-    ws.uid = uuid.v4();
     ws.nick = 'guest';
+    ws.uid = uuid.v4();
 });
 
 wss.broadcast = function broadcast(data) {

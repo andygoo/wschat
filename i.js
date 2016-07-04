@@ -11,7 +11,7 @@ var opts = {
 };
 
 wss.on('connection', function connection(ws) {
-    ws.on('message', function(data) {
+    ws.on('message', function incoming(data) {
 		data = JSON.parse(data);
 		var q = querystring.stringify({'q': data.msg, 'uid': ws.uid});
 		opts.path = '/reply?'+q;

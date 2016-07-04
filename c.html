@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-cn" class="no-js">
+<html lang="zh-cn">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
@@ -20,11 +20,10 @@
 <script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
 <script src="http://cdn.bootcss.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
-
 <script>
 //var ws = new WebSocket("ws://192.168.1.106:10089/");
-//var ws = new WebSocket("ws://127.0.0.1:10089/");
-var ws = new WebSocket("ws://192.168.2.56:10089/");
+var ws = new WebSocket("ws://127.0.0.1:10089/");
+
 ws.onopen = function() {
 	var nickname = $('#nickname').val();
 	if ($.trim(nickname) == '') {

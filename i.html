@@ -17,7 +17,6 @@
         </div>
      </div>
 </div>
-
 <script src="http://cdn.bootcss.com/jquery/1.11.3/jquery.min.js"></script>
 
 <script>
@@ -26,37 +25,25 @@ var ws = new WebSocket("ws://127.0.0.1:10089/");
 
 ws.onopen = function() {
 	var data = {
-		'type': 'sysmsg',
 		'msg': '你好',
 	};
-	addsysmsg(data);
-};
+	addmsg(data, 'left');
+}
 ws.onclose = function() {
 	var data = {
-		'type': 'sysmsg',
 		'msg': 'sys closed',
 	};
-	addsysmsg(data);
-};
+	addmsg(data, 'left');
+}
 ws.onmessage = function (evt) {
 	var data = JSON.parse(event.data);
-	if (data.type == 'msg') {
-		addmsg(data, 'left');
-	} else {
-		addsysmsg(data);
-	}
-};
+	console.log(data);
+	addmsg(data, 'left');
+}
 function addmsg(data, direction) {
-	if (!data.msg) {
-		data.msg = '...&nbsp;';
-	}
 	$('#msgs').append('<li class="'+direction+'"><div class="avatar glyphicon glyphicon-user"></div>'+data.msg+'</li>');
 	//$('#msgs')[0].scrollTop = $('#msgs')[0].scrollHeight;
 	$('body')[0].scrollTop = $('body')[0].scrollHeight;
-}
-
-function addsysmsg(data) {
-	addmsg(data, 'left');
 }
 $(function() {
 	//$('#msgs').attr('style', 'height:' + ($(window).height()-51) + 'px');
@@ -65,12 +52,13 @@ $(function() {
 		if ($.trim(msg) == '') {
 			return false;
 		}
+		
 		var data = {
-			'type': 'msg',
-			'msg': msg,
+			'msg': msg
 		};
 		addmsg(data, 'right');
 		ws.send(JSON.stringify(data));
+		
 		$('#msg_content').val('').focus();
 		return false;
 	});

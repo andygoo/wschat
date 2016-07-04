@@ -20,11 +20,10 @@ wss.on('connection', function connection(ws) {
 			res.on('data', function(chunk) {
 				console.log(chunk);
 				chunk = JSON.parse(chunk);
-				var data = {
-					msg: chunk.data,
-					type: 'msg'
-				};
-				if (chunk.data != '') {
+				if (chunk.data) {
+					var data = {
+						msg: chunk.data
+					};
 					ws.send(JSON.stringify(data));
 				}
 			});
